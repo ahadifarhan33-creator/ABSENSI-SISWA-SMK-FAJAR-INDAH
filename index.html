@@ -33,51 +33,48 @@
         }
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: #0f172a; }
-        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #475569; }
-
-        @keyframes scanBox {
-            0% { top: 10%; opacity: 0.3; }
-            50% { top: 80%; opacity: 1; }
-            100% { top: 10%; opacity: 0.3; }
-        }
-        .scan-line {
-            position: absolute;
-            left: 5%;
-            width: 90%;
-            height: 2px;
-            background: linear-gradient(90deg, transparent, #3b82f6, #60a5fa, transparent);
-            box-shadow: 0 0 15px #3b82f6;
-            animation: scanBox 2.5s infinite ease-in-out;
-        }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 9999px; }
+        
         .face-target-box {
             position: absolute;
-            width: 170px;
-            height: 170px;
-            border: 2px dashed #3b82f6;
-            border-radius: 1.5rem;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            box-shadow: 0 0 25px rgba(59, 130, 246, 0.3);
+            width: 160px;
+            height: 160px;
+            border: 2px dashed #3b82f6;
+            border-radius: 12px;
+        }
+        .scan-line {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: #60a5fa;
+            box-shadow: 0 0 8px #3b82f6;
+            animation: scanAnim 2.5s infinite linear;
+        }
+        @keyframes scanAnim {
+            0% { top: 0%; }
+            50% { top: 100%; }
+            100% { top: 0%; }
         }
     </style>
 </head>
-<body class="min-h-screen flex flex-col items-center justify-center p-3 sm:p-6">
+<body class="min-h-screen flex items-center justify-center p-3 sm:p-6 relative">
 
     <!-- Toast Notification -->
-    <div id="toast" class="hidden fixed bottom-5 right-5 z-50 flex items-center gap-2 bg-emerald-600 text-white px-4 py-3 rounded-xl shadow-lg border border-emerald-400/30 text-sm font-medium transition-all">
-        <i data-lucide="check-circle" class="w-5 h-5"></i>
-        <span id="toast-message">Pesan notifikasi</span>
+    <div id="toast" class="fixed top-5 right-5 z-50 hidden bg-slate-900 border border-slate-700 text-slate-100 text-xs px-4 py-3 rounded-xl shadow-xl flex items-center gap-2">
+        <i data-lucide="info" class="w-4 h-4 text-blue-400"></i>
+        <span id="toast-message">Notifikasi</span>
     </div>
 
     <!-- 1. LOGIN SCREEN -->
-    <div id="login-screen" class="w-full max-w-md bg-cardbg rounded-2xl p-6 sm:p-8 shadow-2xl border border-bordercolor/60 space-y-6">
+    <div id="login-screen" class="w-full max-w-sm bg-cardbg rounded-2xl p-6 sm:p-8 shadow-2xl border border-bordercolor/60 space-y-6">
         <div class="text-center space-y-2">
-            <div class="flex justify-center mb-3">
-                <div class="w-24 h-24 rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center p-4 shadow-lg shadow-blue-500/20 border border-blue-400/30">
-                    <i data-lucide="book-open" class="w-14 h-14 text-white drop-shadow-md"></i>
-                </div>
+            <div class="w-14 h-14 rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-500 mx-auto flex items-center justify-center p-3 shadow-lg border border-blue-400/30">
+                <i data-lucide="book-open" class="w-8 h-8 text-white"></i>
             </div>
             <h1 class="text-xl font-bold text-white tracking-tight">Sistem Absensi SMK FAJAR INDAH</h1>
             <p class="text-xs text-subtext">Masuk untuk mengelola data siswa dan absensi</p>
@@ -190,7 +187,7 @@
                     </button>
                 </div>
                 <p class="text-[11px] text-subtext/80 leading-relaxed">
-                    💡 <strong>Tips Lintas Perangkat:</strong> Tempelkan URL Web App dari Apps Script di atas. Supaya HP/Laptop lain otomatis langsung bisa membaca data, Anda bisa menempelkan URL tersebut di variabel <code>DEFAULT_SHEET_URL</code> dalam kode HTML.
+                    💡 <strong>Tips Google Sheets:</strong> Pastikan script App Script menggunakan metode pementasan ulang (upsert) berdasarkan ID Siswa & Tanggal agar data pada spreadsheet diperbarui di baris yang sama (tanpa membuat baris ganda).
                 </p>
             </div>
 
@@ -316,12 +313,12 @@
                 </button>
             </div>
 
-            <!-- TABEL STATUS KEHADIRAN SISWA DENGAN PILIHAN CLICKLIST (DATANG, ALPA, SAKIT, IZIN) -->
+            <!-- TABEL STATUS KEHADIRAN SISWA DENGAN PILIHAN CLICKLIST -->
             <div class="bg-darkbg/90 border border-bordercolor rounded-xl p-4 space-y-3 mt-4">
                 <div class="flex flex-wrap items-center justify-between gap-2 border-b border-bordercolor/60 pb-2">
                     <h3 class="text-xs sm:text-sm font-semibold text-white flex items-center gap-1.5">
                         <i data-lucide="check-square" class="w-4 h-4 text-emerald-400"></i>
-                        <span>Tabel Status Kehadiran Siswa</span>
+                        <span>Tabel Status Kehadiran Hari Ini</span>
                     </h3>
                     <div class="text-[11px] text-subtext flex items-center gap-2">
                         <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 bg-emerald-500 rounded-sm inline-block"></span> ☑ Datang</span>
@@ -335,19 +332,21 @@
                     <table class="w-full text-left border-collapse text-xs">
                         <thead>
                             <tr class="bg-cardbg text-subtext border-b border-bordercolor sticky top-0">
-                                <th class="p-2.5 w-10 text-center">No</th>
                                 <th class="p-2.5">Nama Siswa</th>
                                 <th class="p-2.5">Kelas</th>
-                                <th class="p-2.5 text-center">Status Kehadiran</th>
+                                <th class="p-2.5">Tanggal</th>
+                                <th class="p-2.5">Jam Datang</th>
+                                <th class="p-2.5">Jam Pulang</th>
+                                <th class="p-2.5 text-center">Status</th>
                             </tr>
                         </thead>
                         <tbody id="tabel-kehadiran-body" class="divide-y divide-bordercolor/40 text-gray-200">
-                            <tr><td colspan="4" class="text-center p-3 text-subtext">Memuat data siswa...</td></tr>
+                            <tr><td colspan="6" class="text-center p-3 text-subtext">Memuat data siswa...</td></tr>
                         </tbody>
                     </table>
                 </div>
 
-                <!-- RINGKASAN REKAP KEHADIRAN (DIHITUNG OTOMATIS PADA AKHIR BULAN / REALTIME) -->
+                <!-- RINGKASAN REKAP KEHADIRAN HARI INI -->
                 <div class="bg-cardbg border border-bordercolor/80 rounded-xl p-3 grid grid-cols-2 sm:grid-cols-4 gap-2 text-center text-xs">
                     <div class="bg-darkbg/60 p-2 rounded-lg border border-emerald-500/30">
                         <div class="text-subtext text-[10px] uppercase tracking-wider font-medium">Total Datang (☑)</div>
@@ -371,9 +370,29 @@
 
         <!-- MENU 3: REKAP LAPORAN -->
         <section id="menu-rekap" class="tab-content space-y-4 hidden">
-            <div class="grid grid-cols-1 sm:grid-cols-4 gap-2.5 bg-darkbg p-3 rounded-xl border border-bordercolor">
+            <!-- Dynamic Cards Rekap Laporan -->
+            <div class="grid grid-cols-1 sm:grid-cols-4 gap-3 mb-2">
+              <div onclick="filterReportByCardStatus('Semua')" class="cursor-pointer transition hover:scale-105 bg-blue-950/40 border-l-4 border-blue-500 p-3 rounded-r-xl border border-bordercolor">
+                <p class="text-[10px] text-blue-400 font-semibold uppercase">Total Siswa Terdata</p>
+                <p id="rekap-total" class="text-xl font-bold text-blue-200 mt-0.5">0</p>
+              </div>
+              <div onclick="filterReportByCardStatus('Datang')" class="cursor-pointer transition hover:scale-105 bg-emerald-950/40 border-l-4 border-emerald-500 p-3 rounded-r-xl border border-bordercolor">
+                <p class="text-[10px] text-emerald-400 font-semibold uppercase">Total Hadir / Datang</p>
+                <p id="rekap-hadir" class="text-xl font-bold text-emerald-200 mt-0.5">0</p>
+              </div>
+              <div onclick="filterReportByCardStatus('Izin')" class="cursor-pointer transition hover:scale-105 bg-amber-950/40 border-l-4 border-amber-500 p-3 rounded-r-xl border border-bordercolor">
+                <p class="text-[10px] text-amber-400 font-semibold uppercase">Total Izin / Sakit</p>
+                <p id="rekap-izinsakit" class="text-xl font-bold text-amber-200 mt-0.5">0</p>
+              </div>
+              <div onclick="filterReportByCardStatus('Alpa')" class="cursor-pointer transition hover:scale-105 bg-rose-950/40 border-l-4 border-rose-500 p-3 rounded-r-xl border border-bordercolor">
+                <p class="text-[10px] text-rose-400 font-semibold uppercase">Total Alpa</p>
+                <p id="rekap-alpa" class="text-xl font-bold text-rose-200 mt-0.5">0</p>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-5 gap-2.5 bg-darkbg p-3 rounded-xl border border-bordercolor">
                 <div>
-                    <label class="block text-[11px] text-subtext mb-1">Filter Tipe Rekap</label>
+                    <label class="block text-[11px] text-subtext mb-1">Tipe Rekap</label>
                     <select id="filter-rekap-tipe" onchange="toggleFilterPeriode(); renderRekapList();" class="w-full bg-cardbg border border-bordercolor rounded-lg px-2.5 py-1.5 text-xs text-white focus:outline-none">
                         <option value="semua">Semua Waktu</option>
                         <option value="harian">Harian</option>
@@ -381,15 +400,15 @@
                     </select>
                 </div>
                 <div id="wrapper-filter-tanggal" class="hidden">
-                    <label class="block text-[11px] text-subtext mb-1">Filter Tanggal</label>
+                    <label class="block text-[11px] text-subtext mb-1">Tanggal</label>
                     <input type="date" id="filter-rekap-tanggal" onchange="renderRekapList()" class="w-full bg-cardbg border border-bordercolor rounded-lg px-2.5 py-1.5 text-xs text-white focus:outline-none">
                 </div>
                 <div id="wrapper-filter-bulan" class="hidden">
-                    <label class="block text-[11px] text-subtext mb-1">Filter Bulan &amp; Tahun</label>
+                    <label class="block text-[11px] text-subtext mb-1">Bulan &amp; Tahun</label>
                     <input type="month" id="filter-rekap-bulan" onchange="renderRekapList()" class="w-full bg-cardbg border border-bordercolor rounded-lg px-2.5 py-1.5 text-xs text-white focus:outline-none">
                 </div>
                 <div>
-                    <label class="block text-[11px] text-subtext mb-1">Filter Kelas</label>
+                    <label class="block text-[11px] text-subtext mb-1">Kelas</label>
                     <select id="filter-rekap-kelas" onchange="renderRekapList()" class="w-full bg-cardbg border border-bordercolor rounded-lg px-2.5 py-1.5 text-xs text-white focus:outline-none">
                         <option value="">Semua Kelas</option>
                     </select>
@@ -398,9 +417,8 @@
                     <label class="block text-[11px] text-subtext mb-1">Status Kehadiran</label>
                     <select id="filter-rekap-status" onchange="renderRekapList()" class="w-full bg-cardbg border border-bordercolor rounded-lg px-2.5 py-1.5 text-xs text-white focus:outline-none">
                         <option value="">Semua Status</option>
-                        <option value="Datang">Datang</option>
+                        <option value="Datang">Datang / Hadir</option>
                         <option value="Pulang">Pulang</option>
-                        <option value="Hadir">Hadir</option>
                         <option value="Sakit">Sakit</option>
                         <option value="Izin">Izin</option>
                         <option value="Alpa">Alpa</option>
@@ -490,12 +508,11 @@
 
     <!-- Application Logic Script -->
     <script>
-        // CONFIGURASI DEFAULT GOOGLE SHEETS
         const DEFAULT_SHEET_URL = "";
 
         window.siswaData = [];
         window.absensiData = [];
-        window.statusKehadiranSiswa = {}; // Penyimpanan status lokal per siswa (1 status per siswa hari ini)
+        window.statusKehadiranSiswa = {}; 
 
         let AUTH_USER = "admin";
         let AUTH_PASS = "demikamu";
@@ -561,7 +578,6 @@
             }
         }
 
-        // LOAD DATA DARI GOOGLE SHEETS CLOUD
         async function loadFromGoogleSheets() {
             const url = getSheetUrl();
             const badge = document.getElementById('sheet-sync-badge');
@@ -587,9 +603,7 @@
                     redirect: 'follow'
                 });
 
-                if (!res.ok) {
-                    throw new Error(`HTTP Status ${res.status}`);
-                }
+                if (!res.ok) throw new Error(`HTTP Status ${res.status}`);
 
                 const json = await res.json();
 
@@ -619,7 +633,6 @@
             }
         }
 
-        // POST DATA KE GOOGLE SHEETS CLOUD
         async function sendToGoogleSheets(action, dataObj) {
             const url = getSheetUrl();
             if (!url || !url.trim().startsWith('http')) {
@@ -924,13 +937,12 @@
             if (window.lucide) lucide.createIcons();
         }
 
-        /* RENDERING TABEL KEHADIRAN SISWA DENGAN TOMBOL CLICKLIST (DATANG, ALPA, SAKIT, IZIN) */
         function renderTabelKehadiran() {
             const tbody = document.getElementById('tabel-kehadiran-body');
             if (!tbody) return;
 
             if (window.siswaData.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="4" class="text-center p-3 text-subtext">Belum ada data siswa terdaftar.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="6" class="text-center p-3 text-subtext">Belum ada data siswa terdaftar.</td></tr>`;
                 hitungRekapOtomatis();
                 return;
             }
@@ -938,25 +950,31 @@
             const today = new Date().toISOString().split('T')[0];
 
             tbody.innerHTML = '';
-            window.siswaData.forEach((siswa, index) => {
-                // Cek status hari ini dari absensiData jika belum ada di statusKehadiranSiswa
-                if (!window.statusKehadiranSiswa[siswa.id]) {
-                    const todayRecord = window.absensiData.find(a => a.siswaId === siswa.id && a.tanggal === today);
-                    window.statusKehadiranSiswa[siswa.id] = todayRecord ? todayRecord.status : 'Datang';
+            window.siswaData.forEach((siswa) => {
+                // Sync status and timestamps from absensiData if available for today
+                const todayRecord = window.absensiData.find(a => (a.siswaId === siswa.id || a.nama === siswa.nama) && a.tanggal === today);
+                if (todayRecord) {
+                    window.statusKehadiranSiswa[siswa.id] = todayRecord.status;
+                } else if (!window.statusKehadiranSiswa[siswa.id]) {
+                    window.statusKehadiranSiswa[siswa.id] = 'Datang';
                 }
 
                 const currentStatus = window.statusKehadiranSiswa[siswa.id];
+                const jamDatang = todayRecord?.jamDatang || (currentStatus === 'Datang' ? '-' : '-');
+                const jamPulang = todayRecord?.jamPulang || '-';
 
                 const tr = document.createElement('tr');
                 tr.className = "hover:bg-cardbg/40 transition border-b border-bordercolor/30";
                 tr.innerHTML = `
-                    <td class="p-2.5 text-center text-subtext font-mono">${index + 1}</td>
                     <td class="p-2.5 font-medium text-white">${escapeHtml(siswa.nama)}</td>
                     <td class="p-2.5 text-subtext">${escapeHtml(siswa.kelas)}</td>
+                    <td class="p-2.5 text-subtext">${escapeHtml(today)}</td>
+                    <td class="p-2.5 text-subtext">${escapeHtml(jamDatang)}</td>
+                    <td class="p-2.5 text-subtext">${escapeHtml(jamPulang)}</td>
                     <td class="p-2.5 text-center">
                         <div class="inline-flex items-center gap-1 bg-darkbg p-1 rounded-lg border border-bordercolor/80">
                             <!-- Clicklist Datang (☑) -->
-                            <button onclick="ubahStatusSiswa('${siswa.id}', 'Datang')" class="px-2 py-1 rounded text-xs font-bold transition ${currentStatus === 'Datang' ? 'bg-emerald-600 text-white shadow' : 'text-subtext hover:text-emerald-400'}" title="Datang (Clicklist)">
+                            <button onclick="ubahStatusSiswa('${siswa.id}', 'Datang')" class="px-2 py-1 rounded text-xs font-bold transition ${currentStatus === 'Datang' || currentStatus === 'Hadir' ? 'bg-emerald-600 text-white shadow' : 'text-subtext hover:text-emerald-400'}" title="Datang / Hadir">
                                 ☑ Datang
                             </button>
                             <!-- Clicklist Sakit (S) -->
@@ -980,8 +998,8 @@
             hitungRekapOtomatis();
         }
 
+        // Change Student Status (Prevents duplicate row creation; updates existing date entry)
         async function ubahStatusSiswa(siswaId, status) {
-            // Memastikan 1 siswa hanya memiliki 1 status kehadiran per hari
             window.statusKehadiranSiswa[siswaId] = status;
 
             const siswaObj = window.siswaData.find(s => s.id === siswaId);
@@ -989,11 +1007,11 @@
                 const today = new Date().toISOString().split('T')[0];
                 const nowTime = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
 
-                // Cek apakah siswa sudah punya record absensi hari ini
-                const existingIndex = window.absensiData.findIndex(a => a.siswaId === siswaId && a.tanggal === today);
+                // Find existing record for today by student ID or Name
+                const existingIndex = window.absensiData.findIndex(a => (a.siswaId === siswaId || a.nama === siswaObj.nama) && a.tanggal === today);
 
                 if (existingIndex !== -1) {
-                    // Update record hari ini secara langsung tanpa duplikasi
+                    // Update existing record row
                     window.absensiData[existingIndex].status = status;
                     if (status === 'Datang') {
                         window.absensiData[existingIndex].jamDatang = nowTime;
@@ -1001,9 +1019,9 @@
                     showToast(`Memperbarui status ${siswaObj.nama} di Google Sheets...`);
                     await sendToGoogleSheets('updateAbsensi', window.absensiData[existingIndex]);
                 } else {
-                    // Jika belum ada record hari ini, buat record baru
+                    // Create new row only if no record exists for today
                     const record = {
-                        id: 'ABS-' + Date.now(),
+                        id: 'ABS-' + siswaObj.id + '-' + today,
                         siswaId: siswaObj.id,
                         nama: siswaObj.nama,
                         kelas: siswaObj.kelas,
@@ -1025,14 +1043,13 @@
             }
         }
 
-        /* KALKULASI OTOMATIS KEHADIRAN (DIHITUNG DARI STATUS SISTEM SECARA REALTIME HARI INI) */
+        /* Real-time Attendance Summary Calculation */
         function hitungRekapOtomatis() {
             let totalDatang = 0;
             let totalSakit = 0;
             let totalIzin = 0;
             let totalAlpa = 0;
 
-            // Hitung tepat 1 status per siswa dari statusKehadiranSiswa
             window.siswaData.forEach(s => {
                 const status = window.statusKehadiranSiswa[s.id] || 'Datang';
                 if (status === 'Datang' || status === 'Hadir') totalDatang++;
@@ -1050,6 +1067,14 @@
             if (elSakit) elSakit.innerText = totalSakit;
             if (elIzin) elIzin.innerText = totalIzin;
             if (elAlpa) elAlpa.innerText = totalAlpa;
+        }
+
+        function filterReportByCardStatus(status) {
+            const selectStatus = document.getElementById('filter-rekap-status');
+            if (selectStatus) {
+                selectStatus.value = status === 'Semua' ? '' : status;
+                renderRekapList();
+            }
         }
 
         function toggleFilterPeriode() {
@@ -1073,9 +1098,29 @@
             const filterBulan = document.getElementById('filter-rekap-bulan') ? document.getElementById('filter-rekap-bulan').value : '';
             const filterStatus = document.getElementById('filter-rekap-status') ? document.getElementById('filter-rekap-status').value : '';
 
+            // Calculate card totals across filtered/total attendance
+            let countHadir = 0;
+            let countIzinSakit = 0;
+            let countAlpa = 0;
+
+            window.absensiData.forEach(item => {
+                if (item.status === 'Datang' || item.status === 'Hadir') countHadir++;
+                else if (item.status === 'Izin' || item.status === 'Sakit') countIzinSakit++;
+                else if (item.status === 'Alpa') countAlpa++;
+            });
+
+            if (document.getElementById('rekap-total')) document.getElementById('rekap-total').innerText = window.absensiData.length || window.siswaData.length;
+            if (document.getElementById('rekap-hadir')) document.getElementById('rekap-hadir').innerText = countHadir;
+            if (document.getElementById('rekap-izinsakit')) document.getElementById('rekap-izinsakit').innerText = countIzinSakit;
+            if (document.getElementById('rekap-alpa')) document.getElementById('rekap-alpa').innerText = countAlpa;
+
             let filtered = window.absensiData.filter(item => {
                 if (filterKelas && item.kelas !== filterKelas) return false;
-                if (filterStatus && item.status !== filterStatus) return false;
+                if (filterStatus) {
+                    if (filterStatus === 'Datang' && !(item.status === 'Datang' || item.status === 'Hadir')) return false;
+                    else if (filterStatus === 'Izin' && !(item.status === 'Izin' || item.status === 'Sakit')) return false;
+                    else if (filterStatus !== 'Datang' && filterStatus !== 'Izin' && item.status !== filterStatus) return false;
+                }
 
                 if (tipeFilter === 'harian' && filterTanggal && item.tanggal !== filterTanggal) return false;
                 if (tipeFilter === 'bulanan' && filterBulan && (item.tanggal || '').substring(0, 7) !== filterBulan) return false;
@@ -1088,7 +1133,7 @@
             tableBody.innerHTML = '';
 
             if (filtered.length === 0) {
-                tableBody.innerHTML = `<tr><td colspan="6" class="text-center p-4 text-xs text-subtext">Tidak ada data absensi ditemukan di Google Sheets.</td></tr>`;
+                tableBody.innerHTML = `<tr><td colspan="6" class="text-center p-4 text-xs text-subtext">Tidak ada data absensi ditemukan. Klik Refresh Data untuk memperbarui dari Google Sheets.</td></tr>`;
                 return;
             }
 
@@ -1096,21 +1141,38 @@
                 const tr = document.createElement('tr');
                 tr.className = "hover:bg-cardbg/50 transition border-b border-bordercolor/30";
 
+                // Memastikan pencocokan nama & kelas jika salah satu properti berasal dari relasi siswaData
+                let nama = item.nama || item.namaSiswa || '-';
+                let kelas = item.kelas || '-';
+
+                if ((!nama || nama === '-') && item.siswaId) {
+                    const foundSiswa = window.siswaData.find(s => s.id === item.siswaId);
+                    if (foundSiswa) {
+                        nama = foundSiswa.nama;
+                        if (!kelas || kelas === '-') kelas = foundSiswa.kelas;
+                    }
+                }
+
+                let jamDatang = item.jamDatang || item.jam_datang || '-';
+                let jamPulang = item.jamPulang || item.jam_pulang || '-';
+                let tanggal = item.tanggal || '-';
+                let status = item.status || 'Hadir';
+
                 let statusBadgeClass = 'bg-emerald-950 text-emerald-300 border border-emerald-700/60';
-                if (item.status === 'Pulang') statusBadgeClass = 'bg-rose-950 text-rose-300 border border-rose-700/60';
-                else if (item.status === 'Sakit') statusBadgeClass = 'bg-amber-950 text-amber-300 border border-amber-700/60';
-                else if (item.status === 'Izin') statusBadgeClass = 'bg-blue-950 text-blue-300 border border-blue-700/60';
-                else if (item.status === 'Alpa') statusBadgeClass = 'bg-rose-950 text-rose-400 border border-rose-700/60';
+                if (status === 'Pulang') statusBadgeClass = 'bg-rose-950 text-rose-300 border border-rose-700/60';
+                else if (status === 'Sakit') statusBadgeClass = 'bg-amber-950 text-amber-300 border border-amber-700/60';
+                else if (status === 'Izin') statusBadgeClass = 'bg-blue-950 text-blue-300 border border-blue-700/60';
+                else if (status === 'Alpa') statusBadgeClass = 'bg-rose-950 text-rose-400 border border-rose-700/60';
 
                 tr.innerHTML = `
-                    <td class="p-3 font-medium text-white">${escapeHtml(item.nama)}</td>
-                    <td class="p-3 text-subtext">${escapeHtml(item.kelas)}</td>
-                    <td class="p-3 text-subtext">${escapeHtml(item.tanggal)}</td>
-                    <td class="p-3 text-subtext">${escapeHtml(item.jamDatang)}</td>
-                    <td class="p-3 text-subtext">${escapeHtml(item.jamPulang)}</td>
+                    <td class="p-3 font-medium text-white">${escapeHtml(nama)}</td>
+                    <td class="p-3 text-subtext">${escapeHtml(kelas)}</td>
+                    <td class="p-3 text-subtext">${escapeHtml(tanggal)}</td>
+                    <td class="p-3 text-subtext">${escapeHtml(jamDatang)}</td>
+                    <td class="p-3 text-subtext">${escapeHtml(jamPulang)}</td>
                     <td class="p-3">
                         <span class="px-2.5 py-1 rounded-full text-[10px] font-bold ${statusBadgeClass}">
-                            ${escapeHtml(item.status)}
+                            ${escapeHtml(status)}
                         </span>
                     </td>
                 `;
@@ -1132,10 +1194,9 @@
             const today = new Date().toISOString().split('T')[0];
             const nowTime = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
 
-            const existingIndex = window.absensiData.findIndex(a => a.siswaId === siswaObj.id && a.tanggal === today);
+            const existingIndex = window.absensiData.findIndex(a => (a.siswaId === siswaObj.id || a.nama === siswaObj.nama) && a.tanggal === today);
 
             if (existingIndex !== -1) {
-                // Update record yang ada (misal update jamPulang atau ubah status)
                 const targetRecord = window.absensiData[existingIndex];
                 if (type === 'Pulang') {
                     targetRecord.jamPulang = nowTime;
@@ -1145,12 +1206,11 @@
                     targetRecord.status = 'Datang';
                 }
 
-                showToast(`Mengbarui Absensi ${type} di Google Sheets...`);
+                showToast(`Memperbarui Absensi ${type} di Google Sheets...`);
                 await sendToGoogleSheets('updateAbsensi', targetRecord);
             } else {
-                // Tambah record baru jika belum ada
                 const record = {
-                    id: 'ABS-' + Date.now(),
+                    id: 'ABS-' + siswaObj.id + '-' + today,
                     siswaId: siswaObj.id,
                     nama: siswaObj.nama,
                     kelas: siswaObj.kelas,
